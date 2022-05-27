@@ -9,6 +9,7 @@ const app = express();
 
 const { PORT = 3000 } = process.env; 
 
-app.use(express.json());
+app.use('/users', auth, require('./routes/users'));
+app.use('/cards', auth, require('./routes/movies'));
 
 app.listen(PORT);
