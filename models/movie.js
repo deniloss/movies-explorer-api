@@ -72,3 +72,5 @@ const movieSchema = new mongoose.Schema({
     required: [true, 'поле "nameEN" должно быть заполнено']
   }
 })
+
+exports.Movie = mongoose.model('movie', movieSchema);
