@@ -55,10 +55,12 @@ const movieSchema = new mongoose.Schema({
   },
 
   owner: {
+    type: String,
     required: [true, 'поле "owner" должно быть заполнено']
   },
 
   movieid: {
+    type: Number,
     required: [true, 'поле "movieid" должно быть заполнено']
   },
 
