@@ -1,5 +1,5 @@
-const BadRequestError = require('../errors/bad-request-err');
-const NotFoundError = require('../errors/not-found-err');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 const { Movie } = require('../models/movie');
 
 exports.getMovies = (req, res, next) => {
