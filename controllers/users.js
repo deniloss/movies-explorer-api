@@ -59,3 +59,42 @@ exports.getMe = (req, res, next) => {
       })
       .catch(next);
   };
+
+  exports.registration = (req, res, next) => {
+    const { name, email, password } = req.body;
+    bcrypt
+      .hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        email,
+        password: hash,
+      }))
+      .then((user) => res.status(200).send({ mail: user.email }))
+      .catch((err) => {
+        if (err.name === 'ValidationError' || err.name === 'CastError') {
+          throw new BadRequestError('Данные не прошли валидацию');
+        }
+        if (err.name === 'MongoError' || err.code === '11000') {
+          throw new ConflictError('Такой емейл уже зарегистрирован');
+        }
+        throw err;
+      })
+      .catch(next);
+  };
+  
+  exports.login = (req, res, next) => {
+    const { email, password } = req.body;
+    return User.findUserByCredentials(email, password)
+      .then((user) => {
+        const token = jwt.sign(
+          { _id: user._id },
+          NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+          { expiresIn: '7d' },
+        );
+        return res.send({ jwt: token });
+      })
+      .catch(() => {
+        throw new AuthenticationFailedError('Не удалось авторизироваться');
+      })
+      .catch(next);
+  };
