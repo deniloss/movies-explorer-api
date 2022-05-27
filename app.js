@@ -15,9 +15,6 @@ const { PORT = 3000 } = process.env;
 mongoose
   .connect(NODE_ENV === 'production' ? BASE_URL : '', {
     useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
   });
 
 app.use(requestLogger);
