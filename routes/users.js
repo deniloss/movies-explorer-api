@@ -1,60 +1,19 @@
-
-const userRouter = require('express').Router();
+const usersRoute = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
-const validator = require('validator');
-const auth = require('../middlewares/auth');
-const { getMovies, postMovie, deleteMovie } = require('../controllers/movies');
+const { registration, login } = require('../controllers/users');
 
-userRouter.use(auth);
+const { getMe, updateProfile } = require('../controllers/users');
 
-userRouter.get('/movies', getMovies);
-userRouter.post(
-  '/movies',
+
+usersRoute.get('/users/me', getMe);
+
+usersRoute.patch(
+  '/users/me', 
   celebrate({
-    body: Joi.object().keys({
-      country: Joi.string().required(),
-      director: Joi.string().required(),
-      duration: Joi.number().required(),
-      year: Joi.number().required(),
-      description: Joi.string().required(),
-      image: Joi.string()
-        .required()
-        .custom((value, helpers) => {
-          if (validator.isURL(value)) {
-            return value;
-          }
-          return helpers.message('Изображение должно быть указано ссылкой');
-        }),
-      trailer: Joi.string()
-        .required()
-        .custom((value, helpers) => {
-          if (validator.isURL(value)) {
-            return value;
-          }
-          return helpers.message('Трейлер должен быть передан ссылкой');
-        }),
-      thumbnail: Joi.string().required().custom((value, helpers) => {
-        if (validator.isURL(value)) {
-          return value;
-        }
-        return helpers.message('Миниатюра должна быть передана ссылкой');
-      }),
-      movieId: Joi.number().required(),
-      nameRU: Joi.string().required(),
-      nameEN: Joi.string().required(),
-    }),
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    email: Joi.string().required().email(),
   }),
-  postMovie,
-);
+}), updateProfile);
 
-userRouter.delete(
-  '/movies/:movieId',
-  celebrate({
-    params: Joi.object().keys({
-      movieId: Joi.string().length(24).hex(),
-    }),
-  }),
-  deleteMovie,
-);
-
-module.exports = userRouter;
+module.exports = usersRoute;
