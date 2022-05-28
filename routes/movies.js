@@ -1,15 +1,16 @@
 const movieRouter = require('express').Router();
-const { celebrate, Joi} = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 const BadRequest = require('../errors/BadRequestError');
 const { getMovies, deleteMovie, postMovie } = require('../controllers/movies');
 
 const validationUrl = (url) => {
-  const validate = usUrl(url);
+  const validate = validator.isUrl(url);
   if (validate) {
     return url;
   }
-  throw new BadRequest('Некорректная ссылка')
-}
+  throw new BadRequest('Некорректная ссылка');
+};
 
 movieRouter.get('/movies', getMovies);
 
@@ -30,7 +31,7 @@ movieRouter.post(
       nameEN: Joi.string().required(),
     }),
   }),
-  postMovie
+  postMovie,
 );
 
 movieRouter.delete(
@@ -40,7 +41,7 @@ movieRouter.delete(
       movieId: Joi.string().required().hex().length(24),
     }),
   }),
-  deleteMovie
+  deleteMovie,
 );
 
 module.exports = movieRouter;

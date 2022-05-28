@@ -1,8 +1,8 @@
 const router = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const usersRoute = require('./users');
 const moviesRoute = require('./movies');
 const auth = require('../middlewares/auth');
-const { celebrate, Joi } = require('celebrate');
 const { registration, login } = require('../controllers/users');
 const NotFoundError = require('../errors/NotFoundError');
 

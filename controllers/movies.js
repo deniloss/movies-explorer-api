@@ -32,34 +32,34 @@ exports.deleteMovie = (req, res, next) => {
 };
 
 exports.postMovie = (req, res, next) => {
-    const {
-      country,
-      director,
-      duration,
-      year,
-      description,
-      image,
-      trailer,
-      thumbnail,
-      movieId,
-      nameRU,
-      nameEN,
-    } = req.body;
-    const owner = req.user._id;
-    Movie.create({
-      country,
-      director,
-      duration,
-      year,
-      description,
-      image,
-      trailer,
-      thumbnail,
-      owner,
-      movieId,
-      nameRU,
-      nameEN,
-    })
-      .then((movie) => res.send({ data: movie }))
-      .catch(next);
-  };
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    movieId,
+    nameRU,
+    nameEN,
+  } = req.body;
+  const owner = req.user._id;
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    owner,
+    movieId,
+    nameRU,
+    nameEN,
+  })
+    .then((movie) => res.send({ data: movie }))
+    .catch(next);
+};
