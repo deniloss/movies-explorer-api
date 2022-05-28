@@ -9,7 +9,7 @@ const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 
-const { NODE_ENV, BASE_URL } = process.env;
+const { NODE_ENV, BASE_URL, PORT } = process.env;
 
 const app = express();
 
