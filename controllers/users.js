@@ -5,37 +5,17 @@ const User = require('../models/user');
 const { NODE_ENV, JWT_SECRET } = process.env;
 
 const NotFoundError = require('../errors/NotFoundError');
-const ForbiddenError = require('../errors/ForbiddenError');
 const ConflictError = require('../errors/ConflictError');
 const BadRequestError = require('../errors/BadRequestError');
 const AuthenticationFailedError = require('../errors/AuthenticationFailedError');
 
 exports.getMe = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).send({ message: 'Нет доступа' });
-  }
-
-  const token = authorization.replace('Bearer ', '');
-
-  const isAuthorized = () => {
-    try {
-      return jwt.verify(token, JWT_SECRET);
-    } catch (err) {
-      return false;
-    }
-  };
-
-  if (!isAuthorized(token)) {
-    throw new ForbiddenError('У вас нет доступа');
-  }
-
-  return User.findById(req.user._id)
+  User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        next(new NotFoundError('Пользователь с таким ID не найден'));
+        return next(new NotFoundError('Такого пользователя не существует'));
       }
-      return res.status(200).send({ data: user });
+      return res.send(user);
     })
     .catch(next);
 };
@@ -61,23 +41,24 @@ exports.updateProfile = (req, res, next) => {
 };
 
 exports.registration = (req, res, next) => {
-  const { name, email, password } = req.body;
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      email,
-      password: hash,
-    }))
-    .then((user) => res.status(200).send({ mail: user.email }))
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        throw new BadRequestError('Данные не прошли валидацию');
-      }
-      if (err.name === 'MongoError' || err.code === '11000') {
-        throw new ConflictError('Такой емейл уже зарегистрирован');
-      }
-      throw err;
+  const { email, password, name } = req.body;
+  return bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({ email, password: hash, name })
+        .then(({ _id }) => {
+          User.findById(_id).select()
+            .then((user) => res.status(201).send(user))
+            .catch(next);
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+          } else if (err.name === 'MongoError' && err.code === 11000) {
+            next(new ConflictError('Такой пользователь уже существует'));
+          } else {
+            next(err);
+          }
+        });
     })
     .catch(next);
 };
