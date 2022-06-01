@@ -186,3 +186,5 @@ npm run dev
   </ul>
 </li>
 </ol>
+
+Ссылка на проект - <a>movie-explorer-api.nomoreparties.sbs</a>
