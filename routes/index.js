@@ -10,9 +10,39 @@ router.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      email: Joi.string().required().email(),
-      password: Joi.string().required(),
+      name: Joi
+        .string()
+        .min(2)
+        .max(30)
+        .label('Name')
+        .messages({
+          'string.base': '{#label} должно быть строкой',
+          'any.required': 'Поле {#label} обязательно для заполнения',
+          'string.min': '{#label} должно содержать не менее {#limit} символов',
+          'string.max': '{#label} должно содержать не более {#limit} символов',
+          'string.empty': 'Поле {#label} не может быть пустым',
+        }),
+      email: Joi
+        .string()
+        .required()
+        .email()
+        .label('Email')
+        .messages({
+          'string.base': '{#label} должен быть строкой',
+          'any.required': 'Поле {#label} обязательно для заполнения',
+          'string.email': '{#label} должен быть валидным',
+          'string.empty': 'Поле {#label} не может быть пустым',
+        }),
+      password: Joi
+        .string()
+        .required()
+        .label('Password')
+        .messages({
+          'string.base': '{#label} должен быть строкой',
+          'any.required': 'Поле {#label} обязательно для заполнения',
+          'string.min': '{#label} должен содержать не менее {#limit} символов',
+          'string.empty': 'Поле {#label} не может быть пустым',
+        }),
     }),
   }),
   registration,
