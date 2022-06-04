@@ -5,7 +5,7 @@ const BadRequest = require('../errors/BadRequestError');
 const { getMovies, deleteMovie, postMovie } = require('../controllers/movies');
 
 const validationUrl = (url) => {
-  const validate = validator.isUrl(url);
+  const validate = validator.isURL(url);
   if (validate) {
     return url;
   }
@@ -24,7 +24,7 @@ movieRouter.post(
       year: Joi.string().required(),
       description: Joi.string().required(),
       image: Joi.string().required().custom(validationUrl),
-      trailer: Joi.string().required().custom(validationUrl),
+      trailerLink: Joi.string().required().custom(validationUrl),
       thumbnail: Joi.string().required().custom(validationUrl),
       movieId: Joi.number().required(),
       nameRU: Joi.string().required(),

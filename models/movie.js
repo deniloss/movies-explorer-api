@@ -31,7 +31,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: [true, 'поле "image" должно быть заполнено'],
     validate: {
-      validator: (v) => validator.usUrl(v),
+      validator: (v) => validator.isURL(v),
       message: 'Введите коректную ссылку на постер',
     },
   },
@@ -40,7 +40,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: [true, 'поле "trailerLink" должно быть заполнено'],
     validate: {
-      validator: (v) => validator.usUrl(v),
+      validator: (v) => validator.isURL(v),
       message: 'Введите коректную ссылку на трейлер',
     },
   },
@@ -49,7 +49,7 @@ const movieSchema = new mongoose.Schema({
     type: String,
     required: [true, 'поле "thumbnail" должно быть заполнено'],
     validate: {
-      validator: (v) => validator.usUrl(v),
+      validator: (v) => validator.isURL(v),
       message: 'Введите коректную ссылку на миниатюру',
     },
   },
@@ -59,9 +59,9 @@ const movieSchema = new mongoose.Schema({
     required: [true, 'поле "owner" должно быть заполнено'],
   },
 
-  movieid: {
+  movieId: {
     type: Number,
-    required: [true, 'поле "movieid" должно быть заполнено'],
+    required: [true, 'поле "movieId" должно быть заполнено'],
   },
 
   nameRU: {

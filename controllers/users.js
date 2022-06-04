@@ -34,8 +34,12 @@ exports.updateProfile = (req, res, next) => {
       }
       res.send(user);
     })
-    .catch(() => {
-      throw new ConflictError('Произошел конфликт');
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+      } else {
+        next(err);
+      }
     })
     .catch(next);
 };
