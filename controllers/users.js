@@ -21,48 +21,56 @@ exports.getMe = (req, res, next) => {
 };
 
 exports.updateProfile = (req, res, next) => {
-  const { name, email } = req.body;
-  const owner = req.user._id;
-  return User.findByIdAndUpdate(
-    owner,
-    { name, email },
-    { new: true, runValidators: true },
-  )
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError('Пользователь с таким ID не найден'));
+  const { email, name } = req.body;
+  User.find({ email })
+    .then((existingUser) => {
+      if (existingUser.length !== 0) {
+        if (existingUser[0]._id.toString() !== req.user._id) {
+          return next(new ConflictError('Пользователь с таким email уже существует'));
+        }
       }
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-      } else {
-        next(err);
-      }
+      return User.findByIdAndUpdate(req.user._id, { email, name }, {
+        new: true,
+        runValidators: true,
+      })
+        .then((user) => {
+          if (!user) {
+            return next(new NotFoundError('Данный пользователь не найден'));
+          }
+          return res.send(user);
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
+          } else {
+            next(err);
+          }
+        });
     })
     .catch(next);
 };
 
 exports.registration = (req, res, next) => {
-  const { email, password, name } = req.body;
-  return bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({ email, password: hash, name })
-        .then(({ _id }) => {
-          User.findById(_id).select()
-            .then((user) => res.status(201).send(user))
-            .catch(next);
-        })
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new BadRequestError(`${Object.values(err.errors).map((error) => error.message).join(', ')}`));
-          } else if (err.name === 'MongoError' && err.code === 11000) {
-            next(new ConflictError('Такой пользователь уже существует'));
-          } else {
-            next(err);
-          }
-        });
+  const { name, email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError('такой пользователь уже есть');
+      } else {
+        return bcrypt.hash(password, 10);
+      }
+    })
+    .then((hash) => User.create({
+      name,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.status(200).send({ mail: user.email }))
+    .catch((err) => {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        throw new BadRequestError('Данные не прошли валидацию');
+      } else next(err);
     })
     .catch(next);
 };
